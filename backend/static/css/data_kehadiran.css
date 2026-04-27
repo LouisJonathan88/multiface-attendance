@@ -1,0 +1,138 @@
+/* ============================================================
+   data_kehadiran.css — Halaman Data Kehadiran
+   Depends on: base.css
+   ============================================================ */
+
+/* ── Layout Main ── */
+main {
+  flex:      1;
+  padding:   2.5rem 2rem;
+  max-width: 960px;
+  width:     100%;
+  margin:    0 auto;
+}
+
+/* ── Stat Cards ── */
+.stats {
+  display:               grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:                   1rem;
+  margin-bottom:         1.75rem;
+}
+
+.stat-card {
+  background:    var(--panel);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  padding:       1.25rem 1.5rem;
+}
+
+.stat-val {
+  font-family: "Space Mono", monospace;
+  font-size:   1.8rem;
+  color:       var(--accent);
+}
+
+.stat-label {
+  font-size:  0.8rem;
+  color:      var(--muted);
+  margin-top: 0.3rem;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  display:       flex;
+  align-items:   center;
+  gap:           1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap:     wrap;
+}
+
+.search-wrap {
+  min-width: 200px; /* override base — kehadiran butuh min-width */
+}
+
+/* ── Date Filter ── */
+.date-filter {
+  display:     flex;
+  align-items: center;
+  gap:         0.5rem;
+}
+
+.date-filter label {
+  font-size: 0.8rem;
+  color:     var(--muted);
+}
+
+.date-filter input[type="date"] {
+  background:    var(--panel);
+  border:        1px solid var(--border);
+  border-radius: 8px;
+  padding:       0.55rem 0.85rem;
+  color:         var(--text);
+  font-family:   "DM Sans", sans-serif;
+  font-size:     0.85rem;
+  outline:       none;
+  transition:    border-color 0.2s;
+  color-scheme:  dark;
+}
+
+.date-filter input[type="date"]:focus { border-color: var(--accent2); }
+
+/* ── Status Badge Hadir ── */
+.badge-hadir {
+  display:       inline-block;
+  padding:       0.2rem 0.65rem;
+  border-radius: 20px;
+  font-size:     0.75rem;
+  font-weight:   600;
+  background:    rgba(79, 255, 176, 0.12);
+  color:         var(--accent);
+  border:        1px solid rgba(79, 255, 176, 0.25);
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-wrap {
+    max-width: 100%;
+  }
+
+  .date-filter {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .badge {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 600px;
+  }
+}
+@media (max-width: 768px) {
+  th, td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .page-title {
+    font-size: 1rem;
+  }
+}

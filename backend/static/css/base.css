@@ -1,0 +1,220 @@
+/* ============================================================
+   base.css — Variabel, reset, dan komponen bersama
+   Digunakan oleh semua halaman
+   ============================================================ */
+
+/* ── CSS Variables ── */
+:root {
+  --bg:      #0d0f14;
+  --panel:   #13161e;
+  --border:  #1f2330;
+  --accent:  #4fffb0;
+  --accent2: #3de8ff;
+  --danger:  #ff4f6d;
+  --warn:    #ffbb33;
+  --text:    #e8eaf0;
+  --muted:   #6b7280;
+  --radius:  12px;
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Body ── */
+body {
+  background:  var(--bg);
+  color:       var(--text);
+  font-family: "DM Sans", sans-serif;
+  min-height:  100vh;
+  display:     flex;
+  flex-direction: column;
+}
+
+/* ── Navbar ── */
+nav {
+  background:    var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding:       0 2rem;
+  display:       flex;
+  align-items:   center;
+  height:        56px;
+}
+
+nav .brand {
+  font-family:    "Space Mono", monospace;
+  font-size:      0.85rem;
+  color:          var(--accent);
+  margin-right:   2.5rem;
+  letter-spacing: 0.05em;
+}
+
+nav a {
+  color:           var(--muted);
+  text-decoration: none;
+  font-size:       0.9rem;
+  padding:         0 1rem;
+  height:          56px;
+  display:         flex;
+  align-items:     center;
+  border-bottom:   2px solid transparent;
+  transition:      color 0.2s, border-color 0.2s;
+}
+
+nav a:hover       { color: var(--text); }
+nav a.active      { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── Page Title ── */
+.page-title {
+  font-family:    "Space Mono", monospace;
+  font-size:      1.1rem;
+  color:          var(--accent);
+  margin-bottom:  1.5rem;
+  letter-spacing: 0.04em;
+}
+
+/* ── Badge ── */
+.badge {
+  font-family: "Space Mono", monospace;
+  font-size:   0.75rem;
+  background:  rgba(79, 255, 176, 0.1);
+  color:       var(--accent);
+  border:      1px solid rgba(79, 255, 176, 0.2);
+  padding:     0.3rem 0.75rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── Search Bar ── */
+.search-wrap {
+  position: relative;
+  flex:      1;
+  max-width: 360px;
+}
+
+.search-wrap input {
+  width:       100%;
+  background:  var(--panel);
+  border:      1px solid var(--border);
+  border-radius: 8px;
+  padding:     0.6rem 1rem 0.6rem 2.5rem;
+  color:       var(--text);
+  font-family: "DM Sans", sans-serif;
+  font-size:   0.9rem;
+  outline:     none;
+  transition:  border-color 0.2s;
+}
+
+.search-wrap input:focus { border-color: var(--accent2); }
+
+.search-wrap svg {
+  position:        absolute;
+  left:            0.75rem;
+  top:             50%;
+  transform:       translateY(-50%);
+  color:           var(--muted);
+  pointer-events:  none;
+}
+
+/* ── Table ── */
+.table-wrap {
+  background:    var(--panel);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  overflow:      hidden;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+thead tr { background: rgba(255, 255, 255, 0.03); }
+
+th {
+  padding:        0.85rem 1.25rem;
+  text-align:     left;
+  font-size:      0.75rem;
+  font-weight:    600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color:          var(--muted);
+  border-bottom:  1px solid var(--border);
+}
+
+td {
+  padding:       0.85rem 1.25rem;
+  font-size:     0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:last-child td  { border-bottom: none; }
+tbody tr:hover          { background: rgba(255, 255, 255, 0.025); }
+
+td.nim   { font-family: "Space Mono", monospace; font-size: 0.82rem; color: var(--accent2); }
+td.nama  { font-weight: 500; }
+td.waktu { color: var(--muted); font-size: 0.82rem; }
+
+/* ── Empty State ── */
+.empty {
+  padding:    3rem 1rem;
+  text-align: center;
+  color:      var(--muted);
+  font-size:  0.9rem;
+}
+.empty svg { display: block; margin: 0 auto 0.75rem; opacity: 0.3; }
+
+/* ── Shimmer Loading ── */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--panel) 25%,
+    rgba(255, 255, 255, 0.04) 50%,
+    var(--panel) 75%
+  );
+  background-size: 200% 100%;
+  animation:       shimmer 1.2s infinite;
+  border-radius:   4px;
+  height:          14px;
+}
+@keyframes shimmer {
+  from { background-position:  200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ── Dot Live (kamera indicator) ── */
+.dot-live {
+  width:         8px;
+  height:        8px;
+  border-radius: 50%;
+  background:    var(--muted);
+  flex-shrink:   0;
+}
+.dot-live.on {
+  background: var(--danger);
+  animation:  blink 1s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+@media (max-width: 768px) {
+  nav {
+    padding: 0 1rem;
+    height: auto;
+    flex-wrap: wrap;
+  }
+
+  nav .brand {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  nav a {
+    padding: 0.5rem 0.75rem;
+    height: auto;
+  }
+}
