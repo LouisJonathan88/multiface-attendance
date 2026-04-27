@@ -174,8 +174,12 @@ connection_pool = pooling.MySQLConnectionPool(
 
 
 def get_conn():
-    return connection_pool.get_connection()
-
+    conn = connection_pool.get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SET time_zone = '+07:00';")
+    cursor.close()
+    
+    return conn
 
 # ════════════════════════════════
 #  MAHASISWA
