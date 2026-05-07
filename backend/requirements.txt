@@ -1,4 +1,5 @@
-flask
+lask
 mysql-connector-python
 python-dotenv
 gunicorn
+numpy
