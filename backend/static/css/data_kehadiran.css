@@ -74,7 +74,7 @@ main {
   font-size:     0.85rem;
   outline:       none;
   transition:    border-color 0.2s;
-  color-scheme:  dark;
+  color-scheme:  light;
 }
 
 .date-filter input[type="date"]:focus { border-color: var(--accent2); }
@@ -134,5 +134,15 @@ main {
 
   .page-title {
     font-size: 1rem;
+  }
+}
+
+
+@media (max-width: 768px) {
+  /* ... kode yang sudah ada sebelumnya ... */
+  
+  .btn-export {
+    width: 100%;
+    margin-top: 0.5rem;
   }
 }

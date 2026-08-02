@@ -1,193 +1,145 @@
-// let evtSource = null;
-
-// window.addEventListener("DOMContentLoaded", () => {
-//   const filterInput = document.getElementById('filter-date');
-//   const saved = sessionStorage.getItem('kehadiran_filter_date');
-
-//   filterInput.value = saved || getToday();
-
-//   startSSE();
-// });
-
-
-// // ================================
-// // START SSE
-// // ================================
-// function startSSE() {
-//   const keyword = document.getElementById('search').value.trim();
-//   const tanggal = document.getElementById('filter-date').value;
-
-//   // tutup koneksi lama
-//   if (evtSource) {
-//     evtSource.close();
-//   }
-
-//   const url = `/kehadiran/stream?keyword=${encodeURIComponent(keyword)}&tanggal=${tanggal}`;
-//   evtSource = new EventSource(url);
-
-//   evtSource.onmessage = function(event) {
-//     const data = JSON.parse(event.data);
-
-//     if (data.error) {
-//       console.error("Error:", data.error);
-//       return;
-//     }
-
-//     renderTable(data);
-//   };
-
-//   evtSource.onerror = function() {
-//     console.log("SSE error, reconnecting...");
-//     evtSource.close();
-
-//     setTimeout(() => {
-//       startSSE();
-//     }, 3000);
-//   };
-// }
-
-
-// // ================================
-// // RENDER TABLE
-// // ================================
-// function renderTable(data) {
-//   const tbody = document.getElementById('tbody');
-
-//   document.getElementById('total-badge').textContent = `${data.length} data`;
-
-//   if (data.length === 0) {
-//     tbody.innerHTML = `
-//       <tr><td colspan="4">
-//         <div class="empty">Tidak ada data kehadiran</div>
-//       </td></tr>`;
-//     return;
-//   }
-
-//   tbody.innerHTML = data.map(row => `
-//     <tr>
-//       <td class="nim">${row.nim}</td>
-//       <td class="nama">${row.nama}</td>
-//       <td class="waktu">${row.waktu_absen}</td>
-//       <td><span class="badge-hadir">${row.status}</span></td>
-//     </tr>
-//   `).join('');
-// }
-
-
-// // ================================
-// // FILTER & SEARCH
-// // ================================
-// function onDateChange() {
-//   const val = document.getElementById('filter-date').value;
-//   sessionStorage.setItem('kehadiran_filter_date', val);
-
-//   startSSE(); // restart stream
-// }
-
-// function onSearch() {
-//   startSSE(); // restart stream
-// }
-
-
-// // ================================
-// // UTIL
-// // ================================
-// function getToday() {
-//   return new Date().toLocaleDateString('sv-SE');
-// }
-
-
-// ================================
-// GANTI SELURUH JS DENGAN INI
-// ================================
-
-let refreshInterval = null;
-
 window.addEventListener("DOMContentLoaded", () => {
-  const filterInput = document.getElementById('filter-date');
-  const saved = sessionStorage.getItem('kehadiran_filter_date');
-  filterInput.value = saved || getToday();
+  const filterDari = document.getElementById('filter-date-dari');
+  const filterSampai = document.getElementById('filter-date-sampai');
 
-  fetchData(); // load pertama
-  startAutoRefresh(); // mulai auto refresh
+  // Ambil state terakhir atau gunakan default hari ini
+  filterDari.value = sessionStorage.getItem('kehadiran_filter_dari') || getToday();
+  filterSampai.value = sessionStorage.getItem('kehadiran_filter_sampai') || getToday();
+
+  muatDataKehadiran();
 });
 
-
 // ================================
-// FETCH DATA (SIMPLE & CEPAT)
+// AMBIL DATA
 // ================================
-async function fetchData() {
+function muatDataKehadiran() {
   const keyword = document.getElementById('search').value.trim();
-  const tanggal = document.getElementById('filter-date').value;
-  
+  const tglDari = document.getElementById('filter-date-dari').value;
+  const tglSampai = document.getElementById('filter-date-sampai').value;
 
-  const url = `/kehadiran/data?keyword=${encodeURIComponent(keyword)}&tanggal=${tanggal}`;
+  const url = `/kehadiran/data?keyword=${encodeURIComponent(keyword)}&tanggal_dari=${tglDari}&tanggal_sampai=${tglSampai}`;
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.error) {
-      console.error("Error:", data.error);
-      return;
-    }
-
-    renderTable(data);
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      renderTable(data, keyword, tglDari, tglSampai);
+    })
+    .catch(err => {
+      console.error("Gagal memuat data kehadiran:", err);
+      tampilkanNotifikasi("Gagal memuat data kehadiran. Coba muat ulang halaman.", "error");
+    });
 }
-
-
-// ================================
-// AUTO REFRESH TIAP 10 DETIK
-// ================================
-function startAutoRefresh() {
-  if (refreshInterval) clearInterval(refreshInterval);
-  refreshInterval = setInterval(fetchData, 10000); // tiap 10 detik
-}
-
 
 // ================================
 // FILTER & SEARCH
 // ================================
 function onDateChange() {
-  const val = document.getElementById('filter-date').value;
-  sessionStorage.setItem('kehadiran_filter_date', val);
+  const tglDari = document.getElementById('filter-date-dari').value;
+  const tglSampai = document.getElementById('filter-date-sampai').value;
 
-  fetchData(); // langsung fetch, tidak perlu restart stream
+  // Skenario: Validasi Tanggal Terbalik
+  if (tglDari && tglSampai && tglDari > tglSampai) {
+    tampilkanNotifikasi("Rentang tanggal tidak valid: 'Tanggal Dari' tidak boleh melewati 'Tanggal Sampai'.", "error");
+    return; // Berhenti di sini, jangan fetch data
+  }
+
+  sessionStorage.setItem('kehadiran_filter_dari', tglDari);
+  sessionStorage.setItem('kehadiran_filter_sampai', tglSampai);
+  muatDataKehadiran();
 }
 
 function onSearch() {
-  fetchData();
+  muatDataKehadiran();
 }
 
+// ================================
+// EXPORT EXCEL
+// ================================
+function exportExcel() {
+  const keyword = document.getElementById('search').value.trim();
+  const tglDari = document.getElementById('filter-date-dari').value;
+  const tglSampai = document.getElementById('filter-date-sampai').value;
+
+  if (tglDari && tglSampai && tglDari > tglSampai) {
+    tampilkanNotifikasi("Perbaiki rentang tanggal terlebih dahulu sebelum melakukan export.", "error");
+    return;
+  }
+
+  const url = `/kehadiran/export?keyword=${encodeURIComponent(keyword)}&tanggal_dari=${tglDari}&tanggal_sampai=${tglSampai}`;
+
+  tampilkanNotifikasi("Menyiapkan file Excel...", "info");
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Gagal mengekspor data");
+      }
+      return response.blob();
+    })
+    .then(blob => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `Presensi_${tglDari || 'semua'}_sd_${tglSampai || 'data'}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      tampilkanNotifikasi("Data kehadiran berhasil diekspor.", "success");
+    })
+    .catch(err => {
+      console.error("Export error:", err);
+      tampilkanNotifikasi("Tidak ada data yang dapat diekspor atau terjadi kesalahan.", "error");
+    });
+}
 
 // ================================
-// RENDER TABLE (sama seperti sebelumnya)
+// NOTIFIKASI
 // ================================
-function renderTable(data) {
+function tampilkanNotifikasi(pesan, tipe = "info") {
+  let notif = document.getElementById('notif-toast');
+  if (!notif) {
+    notif = document.createElement('div');
+    notif.id = 'notif-toast';
+    document.body.appendChild(notif);
+  }
+
+  notif.textContent = pesan;
+  notif.className = `notif-toast notif-${tipe} show`;
+
+  clearTimeout(notif._timeoutId);
+  notif._timeoutId = setTimeout(() => {
+    notif.classList.remove('show');
+  }, 3000);
+}
+
+// ================================
+// RENDER TABLE
+// ================================
+function renderTable(data, keyword = "", tglDari = "", tglSampai = "") {
   const tbody = document.getElementById('tbody');
   document.getElementById('total-badge').textContent = `${data.length} data`;
 
   if (data.length === 0) {
-    tbody.innerHTML = `
-      <tr><td colspan="4">
-        <div class="empty">Tidak ada data kehadiran</div>
-      </td></tr>`;
+    let pesan = "Data tidak ditemukan";
+    // Jika tidak ada filter yang dipakai sama sekali, pesan menyesuaikan
+    if (!keyword && !tglDari && !tglSampai) {
+      pesan = "Data kehadiran belum tersedia";
+    }
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty" style="text-align: center; padding: 20px;">${pesan}</div></td></tr>`;
     return;
   }
 
   tbody.innerHTML = data.map(row => `
     <tr>
-      <td class="nim">${row.nim}</td>
+      <td class="nomor-identitas">${row.nomor_identitas}</td>
       <td class="nama">${row.nama}</td>
-      <td class="waktu">${row.waktu_absen}</td>
+      <td class="waktu">${row.waktu_presensi}</td>
       <td><span class="badge-hadir">${row.status}</span></td>
     </tr>
   `).join('');
 }
-
 
 // ================================
 // UTIL

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data Kehadiran — Sistem Absensi</title>
+    <title>Data Kehadiran</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -24,8 +24,6 @@
     </nav>
 
     <main>
-      <div class="page-title">DATA KEHADIRAN</div>
-
       <!-- Toolbar -->
       <div class="toolbar">
         <div class="search-wrap">
@@ -43,14 +41,37 @@
           <input
             type="text"
             id="search"
-            placeholder="Cari NIM atau Nama..."
+            placeholder="Cari nomor identitas atau nama..."
             oninput="onSearch()"
           />
         </div>
         <div class="date-filter">
-          <label>Tanggal:</label>
-          <input type="date" id="filter-date" onchange="onDateChange()" />
+          <label>Dari:</label>
+          <input type="date" id="filter-date-dari" onchange="onDateChange()" />
+          <label>Sampai:</label>
+          <input
+            type="date"
+            id="filter-date-sampai"
+            onchange="onDateChange()"
+          />
         </div>
+        <button id="btn-export" class="btn btn-export" onclick="exportExcel()">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Export Excel
+        </button>
         <span class="badge" id="total-badge">0 data</span>
       </div>
 
@@ -59,9 +80,9 @@
         <table>
           <thead>
             <tr>
-              <th>NIM</th>
-              <th>Nama Mahasiswa</th>
-              <th>Waktu Absen</th>
+              <th>Nomor Identitas</th>
+              <th>Nama Pengguna</th>
+              <th>Waktu Presensi</th>
               <th>Status</th>
             </tr>
           </thead>
