@@ -17,18 +17,14 @@ from db import (
 app = Flask(__name__)
 
 
-# ════════════════════════════════
 #  HALAMAN
-# ════════════════════════════════
 @app.route('/')
 @app.route('/kehadiran')
 def kehadiran():
     return render_template('data_kehadiran.html')
 
 
-# ════════════════════════════════
 #  API DATA WEB
-# ════════════════════════════════
 @app.route('/kehadiran/data')
 def kehadiran_data():
     keyword = request.args.get('keyword', '').strip()
@@ -81,10 +77,7 @@ def kehadiran_export():
 
     return send_file(output, download_name=filename, as_attachment=True, mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-
-# ════════════════════════════════
 #  API ENDPOINT UNTUK EDGE (RPi)
-# ════════════════════════════════
 
 @app.route('/api/pengguna', methods=['POST'])
 def api_simpan_pengguna():
@@ -173,9 +166,7 @@ def api_get_presensi_hari_ini():
         return jsonify({"error": str(e)}), 500
 
 
-# ════════════════════════════════
-#  MAIN
-# ════════════════════════════════
 
+#  MAIN
 if __name__ == '__main__':
     app.run(debug=True, threaded=True, use_reloader=False)

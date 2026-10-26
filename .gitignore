@@ -1,5 +1,16 @@
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+
+# Environment variables
 .env
-registrasi-absensi/
-venv/
+
+# Folder hasil deteksi dan pemrosesan wajah
+registrasi-absensi/deteksi/
+registrasi-absensi/registrasi/
+registrasi-absensi/face_crop/
+registrasi-absensi/faces_aligned/
+registrasi-absensi/faces_resized/
+
+# Log presensi
+registrasi-absensi/log_waktu_presensi.txt

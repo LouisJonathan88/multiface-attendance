@@ -10,8 +10,8 @@ load_dotenv()
 DB_CONFIG = {
     "host":     os.getenv("DB_HOST", "localhost"),
     "port":     int(os.getenv("DB_PORT", 3306)),
-    "user":     os.getenv("DB_USER", "lj"),
-    "password": os.getenv("DB_PASS", "LJ123"),
+    "user":     os.getenv("DB_USER", "root"),
+    "password": os.getenv("DB_PASS", ""),
     "database": os.getenv("DB_NAME", "presensi_wajah"),
 }
 
@@ -31,9 +31,7 @@ def get_conn():
     return conn
 
 
-# ════════════════════════════════
 #  PENGGUNA
-# ════════════════════════════════
 
 def nomor_identitas_sudah_terdaftar(nomor_identitas: str) -> bool:
     conn   = get_conn()
@@ -83,9 +81,7 @@ def get_nama(nomor_identitas: str) -> str:
         conn.close()
 
 
-# ════════════════════════════════
 #  EMBEDDING
-# ════════════════════════════════
 
 def simpan_embedding(nomor_identitas: str, vector: np.ndarray) -> None:
     """
@@ -98,9 +94,9 @@ def simpan_embedding(nomor_identitas: str, vector: np.ndarray) -> None:
         vector_bytes = vector.astype(np.float32).tobytes()
         cursor.execute(
             """
-            INSERT INTO embedding (nomor_identitas, face_embedding)
+            INSERT INTO embedding (nomor_identitas, vector)
             VALUES (%s, %s)
-            ON DUPLICATE KEY UPDATE face_embedding = VALUES(face_embedding)
+            ON DUPLICATE KEY UPDATE vector = VALUES(vector)
             """,
             (nomor_identitas, vector_bytes)
         )
@@ -122,7 +118,7 @@ def load_semua_embedding() -> dict:
     conn   = get_conn()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT nomor_identitas, face_embedding FROM embedding")
+        cursor.execute("SELECT nomor_identitas, vector FROM embedding")
         rows = cursor.fetchall()
     finally:
         cursor.close()
@@ -137,9 +133,7 @@ def load_semua_embedding() -> dict:
     return embeddings
 
 
-# ════════════════════════════════
 #  PRESENSI
-# ════════════════════════════════
 
 def sudah_presensi_hari_ini(nomor_identitas: str) -> bool:
     conn   = get_conn()
@@ -202,9 +196,7 @@ def get_nomor_identitas_presensi_hari_ini() -> set:
         conn.close()
 
 
-# ════════════════════════════════
 #  KEHADIRAN
-# ════════════════════════════════
 
 def get_kehadiran(keyword: str = "", tanggal_dari: str = "", tanggal_sampai: str = "") -> list:
     conn   = get_conn()
@@ -232,7 +224,7 @@ def get_kehadiran(keyword: str = "", tanggal_dari: str = "", tanggal_sampai: str
             query += " AND a.waktu_presensi <= %s"
             params.append(f"{tanggal_sampai} 23:59:59")
 
-        query += " ORDER BY a.waktu_presensi DESC"  # LIMIT dihapus agar bisa ditarik semua
+        query += " ORDER BY a.waktu_presensi DESC" 
 
         cursor.execute(query, params)
         rows = cursor.fetchall()
